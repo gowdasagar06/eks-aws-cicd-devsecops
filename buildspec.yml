@@ -21,6 +21,9 @@ phases:
       - cp hadolint /bin
       - chmod +x /bin/hadolint
       - /bin/hadolint --version
+      - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
+      - tar -xvf kube-linter-linux.tar.gz
+      - mv kube-linter /usr/local/bin/
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
@@ -54,6 +57,8 @@ phases:
       - cat $DEPLOYMENT_PATH
       - echo "Update Kube Config"      
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $REGION
+      - kube-linter check list
+      - kube-linter lint argocd-eks-manifests/
       - kubectl apply -f argocd-eks-manifests/namespace.yml
       - sleep 5
       - kubectl apply -f argocd-eks-manifests/
