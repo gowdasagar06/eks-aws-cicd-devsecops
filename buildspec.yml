@@ -1,0 +1,59 @@
+version: 0.2
+env: 
+  secrets-manager:
+    AWS_ACCESS_KEY_ID: arn:aws:secretsmanager:ap-south-1:533267334695:secret:anonymous-aws-credentials-NDJohM:access-key
+    AWS_SECRET_ACCESS_KEY : arn:aws:secretsmanager:ap-south-1:533267334695:secret:anonymous-aws-credentials-NDJohM:secret-key
+
+phases:
+  install:
+    commands:
+      - aws --version
+      - echo Installing app dependencies...
+      - curl -LO https://dl.k8s.io/release/v1.27.2/bin/linux/amd64/kubectl   
+      - chmod +x ./kubectl
+      - mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$PATH:$HOME/bin
+      - echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
+      - source ~/.bashrc
+      - echo 'Check kubectl version'
+      - kubectl version --short --client
+      - echo Downloading the Hadolint tool...
+      - wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64
+      - cp hadolint /bin
+      - chmod +x /bin/hadolint
+      - /bin/hadolint --version
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 533267334695.dkr.ecr.ap-south-1.amazonaws.com
+      - REPOSITORY_URI=533267334695.dkr.ecr.ap-south-1.amazonaws.com/2-tier-app
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+      - EKS_CLUSTER_NAME="eks-deployment"
+      - REGION="ap-south-1"
+      - DEPLOYMENT_PATH="argocd-eks-manifests/two-tier-app-deployment.yml"
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - echo Build started on `date`
+      - echo Validating the Dockerfile using Hadolint tool...
+      - /bin/hadolint --config hadolint.yml Dockerfile 2>&1 | tee output.log
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - NEW_IMAGE_NAME=" $REPOSITORY_URI:$IMAGE_TAG"
+      - echo $NEW_IMAGE_NAME
+      - sed -i "s|image:.*|image:$NEW_IMAGE_NAME|" $DEPLOYMENT_PATH
+      - cat $DEPLOYMENT_PATH
+      - echo "Update Kube Config"      
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $REGION
+      - kubectl apply -f argocd-eks-manifests/namespace.yml
+      - sleep 5
+      - kubectl apply -f argocd-eks-manifests/
