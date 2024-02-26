@@ -1,0 +1,12 @@
+{
+    "name": "your/vendor-name",
+    "description": "Your project description",
+    "require": {
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Your\\Namespace\\": "src/"
+        }
+    }
+}
