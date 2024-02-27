@@ -27,11 +27,11 @@ phases:
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
       - sudo mv kube-linter /usr/local/bin/
-      - sudo apt update 
-      - sudo apt install openjdk-17-jre-headless 
+      - apt update 
+      - apt install openjdk-17-jre-headless 
       - VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
       - curl -Ls "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-      - sudo apt install unzip 
+      - apt install unzip 
       - unzip dependency-check.zip
 
   pre_build:
