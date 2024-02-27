@@ -21,12 +21,12 @@ phases:
       - kubectl version --short --client
       - echo "Downloading the Hadolint tool..."
       - wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64
-      - sudo cp hadolint /usr/local/bin/hadolint
-      - sudo chmod +x /usr/local/bin/hadolint
+      - cp hadolint /usr/local/bin/hadolint
+      - chmod +x /usr/local/bin/hadolint
       - hadolint --version
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
-      - sudo mv kube-linter /usr/local/bin/
+      - mv kube-linter /usr/local/bin/
       - yum update -y
       # - apt install openjdk-17-jre-headless -y
       - yum install java-17-openjdk-headless -y
