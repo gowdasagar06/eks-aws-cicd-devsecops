@@ -24,6 +24,12 @@ phases:
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
       - mv kube-linter /usr/local/bin/
+      # - apt update -y
+      # - apt install openjdk-17-jre-headless -y
+      # - VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
+      # - curl -Ls "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
+      # - apt install unzip -y
+      # - unzip dependency-check.zip
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
@@ -33,16 +39,18 @@ phases:
       - REPOSITORY_URI=533267334695.dkr.ecr.ap-south-1.amazonaws.com/2-tier-app
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
-      - EKS_CLUSTER_NAME="eks-deployment"
+      - EKS_CLUSTER_NAME="demo"
       - REGION="ap-south-1"
       - DEPLOYMENT_PATH="argocd-eks-manifests/two-tier-app-deployment.yml"
   build:
     commands:
-      - echo Build started on `date`
-      - echo Building the Docker image...
-      - echo Build started on `date`
+      - echo  started on `date`
       - echo Validating the Dockerfile using Hadolint tool...
       - /bin/hadolint --config hadolint.yml Dockerfile 2>&1 | tee output.log
+      # - echo Validating the source code using OWASP Dependency scanner...
+      # - ./dependency-check/bin/dependency-check.sh --out . --scan .
+      - echo Build started on `date`
+      - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
