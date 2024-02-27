@@ -28,7 +28,7 @@ phases:
       - tar -xvf kube-linter-linux.tar.gz
       - mv kube-linter /usr/local/bin/
       - yum update -y
-      - yum install java-17-openjdk-headless -y
+      - sudo yum install java-17-amazon-corretto-headless -y
       - VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
       - curl -Ls "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
       - yum install unzip -y
