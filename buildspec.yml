@@ -37,7 +37,9 @@ phases:
   pre_build:
     commands:
       - echo "Logging in to Amazon ECR..."
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - aws ecr get-login-password --region ap-south-1 | sudo docker login --username AWS --password-stdin 533267334695.dkr.ecr.ap-south-1.amazonaws.com
       - export REPOSITORY_URI=533267334695.dkr.ecr.ap-south-1.amazonaws.com/2-tier-app
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - export IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
