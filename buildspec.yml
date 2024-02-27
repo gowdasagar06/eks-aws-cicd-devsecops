@@ -8,7 +8,7 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      python: 3.11
     commands:
       - aws --version
       - echo "Installing app dependencies..."
@@ -27,11 +27,12 @@ phases:
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
       - sudo mv kube-linter /usr/local/bin/
-      - apt update -y
-      - apt install openjdk-17-jre-headless -y
+      - yum update -y
+      # - apt install openjdk-17-jre-headless -y
+      - yum install java-17-openjdk-headless -y
       - VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
       - curl -Ls "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-      - apt install unzip -y
+      - yum install unzip -y
       - unzip dependency-check.zip
 
   pre_build:
