@@ -73,7 +73,7 @@ phases:
       - sleep 5
       - LB_ADDRESS=$(kubectl get svc -n prod two-tier-app-service -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
       - echo $LB_ADDRESS
-      - ./zap.sh -cmd -quickurl http://$LB_ADDRESS/ -quickprogress -quickout ../zap_report.html
+      - ./ZAP_2.14.0/zap.sh -cmd -quickurl http://$LB_ADDRESS/ -quickprogress -quickout ../zap_report.html
 
 artifacts:
   files:
