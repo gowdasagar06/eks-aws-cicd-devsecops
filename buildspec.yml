@@ -26,7 +26,7 @@ phases:
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
       - mv kube-linter /usr/local/bin/
-      - yum install java-1.8.0-openjdk-devel
+      # - yum install java-1.8.0-openjdk-devel
       - wget https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
       - tar -xvf ZAP_2.14.0_Linux.tar.gz
       - ./ZAP_2.14.0/zap.sh -cmd -quickurl http://test-466115214.ap-south-1.elb.amazonaws.com/ -quickprogress -quickout ../zap_report.html
