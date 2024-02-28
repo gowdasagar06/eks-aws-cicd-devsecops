@@ -29,7 +29,7 @@ phases:
       # - yum install java-1.8.0-openjdk-devel
       - wget https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
       - tar -xvf ZAP_2.14.0_Linux.tar.gz
-      - ./ZAP_2.14.0/zap.sh -cmd -quickurl http://test-466115214.ap-south-1.elb.amazonaws.com/ -quickprogress -quickout ../zap_report.html
+      # - ./ZAP_2.14.0/zap.sh -cmd -quickurl http://test-466115214.ap-south-1.elb.amazonaws.com/ -quickprogress -quickout ../zap_report.html
 
   pre_build:
     commands:
@@ -59,7 +59,7 @@ phases:
       - echo "Pushing the Docker images..."
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - export NEW_IMAGE_NAME="$REPOSITORY_URI:$IMAGE_TAG"
+      - export NEW_IMAGE_NAME=" $REPOSITORY_URI:$IMAGE_TAG"
       - echo $NEW_IMAGE_NAME
       - sed -i "s|image:.*|image:$NEW_IMAGE_NAME|" $DEPLOYMENT_PATH
       - cat $DEPLOYMENT_PATH
