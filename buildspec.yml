@@ -26,12 +26,10 @@ phases:
       - wget https://github.com/stackrox/kube-linter/releases/download/0.2.5/kube-linter-linux.tar.gz
       - tar -xvf kube-linter-linux.tar.gz
       - mv kube-linter /usr/local/bin/
-      - yum update -y
-      - sudo yum install java-17-amazon-corretto-headless -y
-      - VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)
-      - curl -Ls "https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip" --output dependency-check.zip
-      - yum install unzip -y
-      - unzip dependency-check.zip
+      - yum install java-1.8.0-openjdk-devel
+      - wget https://github.com/zaproxy/zaproxy/releases/download/v2.14.0/ZAP_2.14.0_Linux.tar.gz
+      - tar -xvf ZAP_2.14.0_Linux.tar.gz
+      - ./ZAP_2.14.0/zap.sh -cmd -quickurl http://test-466115214.ap-south-1.elb.amazonaws.com/ -quickprogress -quickout ../zap_report.html
 
   pre_build:
     commands:
@@ -51,8 +49,6 @@ phases:
       - echo "Build started on $(date)"
       - echo "Validating the Dockerfile using Hadolint tool..."
       - hadolint --config hadolint.yml Dockerfile 2>&1 | tee output.log
-      - echo "Validating the source code using OWASP Dependency Check..."
-      - ./dependency-check/bin/dependency-check.sh --out . --scan .
       - echo "Building the Docker image..."
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
@@ -74,7 +70,11 @@ phases:
       - kubectl apply -f argocd-eks-manifests/namespace.yml
       - sleep 5
       - kubectl apply -f argocd-eks-manifests/
+      - sleep 5
+      - LB_ADDRESS=$(kubectl get svc -n prod two-tier-app-service -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+      - echo $LB_ADDRESS
+      - ./zap.sh -cmd -quickurl http://$LB_ADDRESS/ -quickprogress -quickout ../zap_report.html
 
 artifacts:
   files:
-    - dependency-check-report.html
+    - zap_report.html
